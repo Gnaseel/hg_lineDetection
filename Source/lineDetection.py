@@ -1,75 +1,8 @@
 import cv2
 import numpy as np
 import os
-import random
 import math
-import matplotlib.pyplot as plt
-
-    #-------------------------RANSAC Parameter------------------------
-threshold = 1
-N = 25
-m = 2
-    #-------------------------Model Parameter------------------------
-    # model = ax+by+c (linear function)
-a = 0
-b = -1
-c = 0
-
-def getMin(list):
-    min =list[0]
-    for i in range(len(list)):
-        if min > list[i]:
-            min = list[i]
-    return min
-
-def getMax(list):
-    max =list[0]
-    for i in range(len(list)):
-        if max < list[i]:
-            max = list[i]
-    return max
-
-def getRandomSample(set, data_size):
-    print('--------------getSample Read--------------------------')
-    while len(set) != m:
-            ran = random.randint(0,data_size-1)
-            set.add(ran)
-
-def getModel(x,y,sample):
-    global a
-    global c
-    # print('--------------getModel--------------------------')
-    # print(sample[0])
-    # print(y[sample[0]])
-    # print(sample[1])
-    # print(y[sample[1]])
-    # print('sample size = {}'.format(len(sample)))
-    # print('data size = {}'.format(len(x)))
-   
-    a = (float)(y[sample[1]]-y[sample[0]]) / (float)(x[sample[1]]-x[sample[0]])
-    c = -a*x[sample[0]] +y[sample[0]]
-    print(a)
-    print(c)
-def getInlier(model_a, model_b, model_c, x, y):
-    num=0
-    for i in range(len(x)):
-        dist = (model_a * x[i] + model_b * y[i] + model_c) / math.sqrt(model_a*model_a + model_b * model_b)
-        if dist < threshold:
-            num = num+1
-    return num
-def RANSAC(x,y):
-    max=0
-    for i in range(N):
-        sample = set([])
-        getRandomSample(sample,len(x))
-        getModel(x, y, list(sample))
-        num = getInlier(a, b, c, x, y)
-        if num > max:
-            max=num
-            re_a=a
-            re_b=b
-            re_c=c
-    return re_a, re_b, re_c
+from ransac_1d import *
 #---------------------------------------------------- PARAMETERS ------------------------------------------------------------
 
 kernel_size = 3 # Gaussian Kerner Size
@@ -92,7 +25,7 @@ def region_of_interest(img, vertices, color3=(255,255,255), color1=255): # ROI �
     ROI_image = cv2.bitwise_and(img, mask)
     return ROI_image
 
-def draw_lines(img, lines, color=[0, 0, 255], thickness=2): # 선 그리기
+def draw_lines(img, lines, color=[0, 0, 255], thickness=7): # 선 그리기
     for line in lines:
         for x1,y1,x2,y2 in line:
             cv2.line(img, (x1, y1), (x2, y2), color, thickness)
